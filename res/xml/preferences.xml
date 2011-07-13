@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<CheckBoxPreference android:title="Calls logging"
+		android:defaultValue="true" android:summary="Automatic calls logging"
+		android:key="callsLogChk" />
+	<CheckBoxPreference android:title="SMS logging"
+		android:defaultValue="true" android:summary="Automatic SMS logging"
+		android:key="smsLogChk" />
+	<CheckBoxPreference android:title="Location logging"
+		android:defaultValue="false" android:summary="Automatic location logging"
+		android:key="locationLogChk" />
+</PreferenceScreen>

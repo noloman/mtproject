@@ -3,17 +3,28 @@
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 
-	<TextView 
-	android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:tex
-		android:text="@string/instructions" />
-		
-	<Button 
-	android:text="Preferences"
-	android:layout_width="wrap_content" 
-	android:id="@+id/prefsBtn" 
-	android:layout_height="wrap_content" 
-	android:layout_x="108dp" android:layout_y="273dp" />
-	
+	<TextView android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="@string/instructions" />
+
+	<Button android:text="Preferences" android:layout_width="wrap_content"
+		android:id="@+id/prefsBtn" android:layout_height="wrap_content"
+		android:layout_x="108dp" android:layout_y="273dp" />
+	<LinearLayout android:layout_height="130dp" android:id="@+id/linearLayout1"
+		android:layout_width="76dp" android:orientation="vertical"
+		android:layout_x="116dp" android:layout_y="119dp">
+		<TextView android:id="@+id/dateLog" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:text="TextView" />
+		<TextView android:id="@+id/typeLog" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:text="TextView" />
+		<TextView android:id="@+id/durationLog"
+			android:layout_height="wrap_content" android:layout_width="wrap_content"
+			android:text="TextView" />
+		<TextView android:id="@+id/textView1" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:text="TextView" />
+		<TextView android:id="@+id/textView2" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:text="TextView" />
+		<TextView android:id="@+id/textView3" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" android:text="TextView" />
+	</LinearLayout>
+
 </AbsoluteLayout>

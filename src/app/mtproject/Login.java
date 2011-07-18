@@ -49,6 +49,7 @@ public class Login extends Activity {
 					// error.setText(res);
 
 					if (res.equals("1")) {
+						// We launch main activity to get the app running after successful login
 						Intent i = new Intent(getApplicationContext(), MtprojectActivity.class);
 						// i.putExtra("Value1", "This value one for ActivityTwo");
 						// i.putExtra("Value2", "This value two ActivityTwo");

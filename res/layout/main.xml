@@ -5,26 +5,15 @@
 
 	<TextView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:text="@string/instructions" />
-
-	<Button android:text="Preferences" android:layout_width="wrap_content"
-		android:id="@+id/prefsBtn" android:layout_height="wrap_content"
-		android:layout_x="108dp" android:layout_y="273dp" />
-	<LinearLayout android:layout_height="130dp" android:id="@+id/linearLayout1"
-		android:layout_width="76dp" android:orientation="vertical"
-		android:layout_x="116dp" android:layout_y="119dp">
-		<TextView android:id="@+id/dateLog" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="TextView" />
-		<TextView android:id="@+id/typeLog" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="TextView" />
-		<TextView android:id="@+id/durationLog"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:text="TextView" />
-		<TextView android:id="@+id/textView1" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="TextView" />
-		<TextView android:id="@+id/textView2" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="TextView" />
-		<TextView android:id="@+id/textView3" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" android:text="TextView" />
+	<Button android:text="startButton" android:id="@+id/startButton" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_x="16dp" android:layout_y="120dp"></Button>
+	<LinearLayout android:id="@+id/linearLayout1" android:layout_width="76dp" android:layout_height="130dp" android:orientation="vertical" android:layout_x="114dp" android:layout_y="117dp">
+		<Button android:text="stopButton" android:layout_gravity="center_horizontal" android:id="@+id/stopButton" android:layout_height="wrap_content" android:layout_width="wrap_content"></Button>
 	</LinearLayout>
+	<Button android:text="invokeButton" android:id="@+id/invokeButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_x="198dp" android:layout_y="116dp"></Button>
+	<Button android:text="releaseButton" android:id="@+id/releaseButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_x="13dp" android:layout_y="226dp"></Button>
+	<Button android:text="bindButton" android:id="@+id/bindButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_x="214dp" android:layout_y="220dp"></Button>
+	<Button android:text="Preferences" android:id="@+id/prefsBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_x="119dp" android:layout_y="272dp"></Button>
+	<TextView android:layout_width="wrap_content" android:text="notApplicable" android:layout_height="wrap_content" android:id="@+id/notApplicable" android:layout_x="18dp" android:layout_y="346dp"></TextView>
+	<TextView android:layout_width="wrap_content" android:text="TextView" android:layout_height="wrap_content" android:id="@+id/serviceStatus" android:layout_x="26dp" android:layout_y="375dp"></TextView>
 
 </AbsoluteLayout>

@@ -8,8 +8,12 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name=".MtprojectActivity" android:label="@string/app_name">
+
 		</activity>
 		<activity android:name=".Preferences" android:label="Preferences">
+			<intent-filter>
+				<category android:name="android.intent.category.PREFERENCE" />
+			</intent-filter>
 		</activity>
 		<activity android:name=".Login" android:label="Login">
 			<intent-filter>
@@ -17,7 +21,15 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<service android:name="callsLoggingService" android:process=":remote" />
-		<service android:name="smsLoggingService" android:process=":remote" />
+		<service android:name="CallsLoggingService" android:process=":remote">
+			<intent-filter>
+				<action android:name="app.mtproject.IMyRemoteCallsLoggingService" />
+			</intent-filter>
+		</service>
+		<service android:name="SmsLoggingService" android:process=":remote">
+			<intent-filter>
+				<action android:name="app.mtproject.IMyRemoteSmsLoggingService" />
+			</intent-filter>
+		</service>
 	</application>
 </manifest>

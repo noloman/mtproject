@@ -34,28 +34,27 @@ public class Login extends Activity {
 
 			@Override
 			public void onClick(View v) {
-
+				
 				ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 				postParameters.add(new BasicNameValuePair("username", un.getText().toString()));
 				postParameters.add(new BasicNameValuePair("password", pw.getText().toString()));
-				// String valid = "1";
 				String response = null;
 				try {
-					response = CustomHttpClient
-							.executeHttpPost("http://10.0.2.2/science/login.php", postParameters);
+					response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/login.php", postParameters);
 					String res = response.toString();
-					// res = res.trim();
 					res = res.replaceAll("\\s+", "");
-					// error.setText(res);
-
 					if (res.equals("1")) {
+						
 						// We launch main activity to get the app running after successful login
+						
 						Intent i = new Intent(getApplicationContext(), MtprojectActivity.class);
-						// i.putExtra("Value1", "This value one for ActivityTwo");
+						
+						i.putExtra("username", un.getText().toString());
 						// i.putExtra("Value2", "This value two ActivityTwo");
 						/* Set the request code to any code you like, you can
 						 * identify the callback via this code
 						 */
+						
 						startActivityForResult(i, REQUEST_CODE);
 					} else {
 						error.setText(res.toString());

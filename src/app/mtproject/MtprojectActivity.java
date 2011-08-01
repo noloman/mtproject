@@ -12,6 +12,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -20,9 +21,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import app.mtproject.sai.*;
 
-public class MtprojectActivity extends Activity implements OnSharedPreferenceChangeListener {
+public class MtprojectActivity extends Activity implements
+		OnSharedPreferenceChangeListener {
 	/** Called when the activity is first created. */
 
 	boolean callsCheckbox;
@@ -39,8 +40,9 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 	public static final String KEY_PRIVATE = "KEY_PRIVATE";
 	private SharedPreferences prefsPrivate;
 	public static final String PREFS_NAME = "MyPrefsFile";
+	private OnSharedPreferenceChangeListener listener;
 
-	private boolean started = false;
+	private boolean startedCalls, startedSms, startedLocation = false;
 
 	private RemoteSmsLoggingServiceConnection SmsLoggingConn = null;
 	private RemoteCallsLoggingServiceConnection CallsLoggingConn = null;
@@ -48,101 +50,62 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 	private IMyRemoteCallsLoggingService callsLoggingService;
 	private IMyRemoteSmsLoggingService smsLoggingService;
 	public String username;
-	
-	
+	SharedPreferences prefs;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		username = getIntent().getExtras().getString("username");
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        // register preference change listener
-        prefs.registerOnSharedPreferenceChangeListener(this);
+
+		// Retrieving preferences
+		callsCheckbox = prefs.getBoolean("callsLogChk", true);
+		smsCheckbox = prefs.getBoolean("smsLogChk", true);
+		locationCheckbox = prefs.getBoolean("locationLogChk", false);
+				
+		prefs.registerOnSharedPreferenceChangeListener(this);
+
 		setContentView(R.layout.main);
-		retrievePreferences();
 
 		Button prefBtn = (Button) findViewById(R.id.prefsBtn);
-//		Button start = (Button)findViewById(R.id.startButton);
-//        Button stop = (Button)findViewById(R.id.stopButton);
-//        Button bind = (Button)findViewById(R.id.bindButton);
-//        Button release = (Button)findViewById(R.id.releaseButton);
-//        Button invoke = (Button)findViewById(R.id.invokeButton);
-//        
-//        start.setOnClickListener(new OnClickListener() {
-//        	public void onClick(View v){
-//        		startCallsService();
-//        	}
-//        });
-//        
-//        stop.setOnClickListener(new OnClickListener() {
-//        	public void onClick(View v){
-//        		stopCallsService();
-//        	}
-//        });       
-//        
-//        bind.setOnClickListener(new OnClickListener() {
-//        	public void onClick(View v){
-//        		bindCallsService();
-//        	}
-//        });  
-//        
-//        release.setOnClickListener(new OnClickListener() {
-//        	public void onClick(View v){
-//        		releaseCallsService();
-//        	}
-//        });          
-//        
-//        invoke.setOnClickListener(new OnClickListener() {
-//        	public void onClick(View v){
-//        		invokeCallsService();
-//        	}
-//        });          
 
 		prefBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				// Explicit intent to call the preferences
-				Intent preferencesActivity = new Intent(getBaseContext(),Preferences.class);
+				Intent preferencesActivity = new Intent(getBaseContext(),
+						Preferences.class);
 				startActivity(preferencesActivity);
 			}
 		});
-	}
-	
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-			String key) {
-		if (key.equals("callsLogChk")) {
-			if (callsCheckbox)
-			{
-				startCallsService();
-				bindCallsService();
-			}
-			else {
-				releaseCallsService();
-				stopCallsService();
-			}
+		
+		if (!startedCalls && callsCheckbox)
+		{
+			startCallsService();
+			bindCallsService();
+		}
+		else if (startedCalls && callsCheckbox)
+		{
+			stopCallsService();
+			releaseCallsService();
 		}
 	}
 
-	private void retrievePreferences() {
-		// Get the xml/preferences.xml preferences
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		
-		callsCheckbox = prefs.getBoolean("callsLogChk", false);
-		smsCheckbox = prefs.getBoolean("smsLogChk", false);
-		locationCheckbox = prefs.getBoolean("locationLogChk", false);
-		
-		prefs.registerOnSharedPreferenceChangeListener(this);
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// Set up a listener whenever a key changes
+		prefs.registerOnSharedPreferenceChangeListener(listener);
+	}
 
-//		if (callsCheckbox) {
-//			startCallsService();
-//			bindCallsService();
-//		}
-//		if (smsCheckbox) {
-//
-//		}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// Unregister the listener whenever a key changes
+		prefs.unregisterOnSharedPreferenceChangeListener(listener);
 	}
 
 	public void startCallsService() {
-		if (started) {
+		if (startedCalls) {
 			Toast.makeText(MtprojectActivity.this, "Service already started",
 					Toast.LENGTH_SHORT).show();
 		} else {
@@ -150,49 +113,49 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 			i.setClassName("app.mtproject", "app.mtproject.CallsLoggingService");
 			i.putExtra("username", username);
 			startService(i);
-			started = true;
+			startedCalls = true;
 			updateCallsServiceStatus();
 			Log.d(getClass().getSimpleName(), "startService()");
 		}
 	}
 
 	private void startSmsService() {
-		if (started) {
+		if (startedSms) {
 			Toast.makeText(MtprojectActivity.this, "Service already started",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
 			startService(i);
-			started = true;
+			startedSms = true;
 			updateSmsServiceStatus();
 			Log.d(getClass().getSimpleName(), "startService()");
 		}
 	}
 
 	private void stopCallsService() {
-		if (!started) {
+		if (!startedCalls) {
 			Toast.makeText(MtprojectActivity.this, "Service not yet started",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.CallsLoggingService");
 			stopService(i);
-			started = false;
+			startedCalls = false;
 			updateCallsServiceStatus();
 			Log.d(getClass().getSimpleName(), "stopService()");
 		}
 	}
 
 	private void stopSmsService() {
-		if (!started) {
+		if (!startedSms) {
 			Toast.makeText(MtprojectActivity.this, "Service not yet started",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
 			stopService(i);
-			started = false;
+			startedSms = false;
 			updateSmsServiceStatus();
 			Log.d(getClass().getSimpleName(), "stopService()");
 		}
@@ -209,7 +172,8 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 			Log.d(getClass().getSimpleName(), "bindService()");
 		} else {
 			Toast.makeText(MtprojectActivity.this,
-					"Cannot bind - service already bound", Toast.LENGTH_SHORT).show();
+					"Cannot bind - service already bound", Toast.LENGTH_SHORT)
+					.show();
 		}
 	}
 
@@ -291,7 +255,8 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 	class RemoteCallsLoggingServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
-			callsLoggingService = IMyRemoteCallsLoggingService.Stub.asInterface((IBinder) boundService);
+			callsLoggingService = IMyRemoteCallsLoggingService.Stub
+					.asInterface((IBinder) boundService);
 			Log.d(getClass().getSimpleName(), "onServiceConnected()");
 			invokeCallsService();
 		}
@@ -320,7 +285,7 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 
 	private void updateCallsServiceStatus() {
 		String bindStatus = CallsLoggingConn == null ? "unbound" : "bound";
-		String startStatus = started ? "started" : "not started";
+		String startStatus = startedCalls ? "started" : "not started";
 		String statusText = "Service status: " + bindStatus + "," + startStatus;
 		TextView t = (TextView) findViewById(R.id.serviceStatus);
 		t.setText(statusText);
@@ -328,7 +293,7 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 
 	private void updateSmsServiceStatus() {
 		String bindStatus = SmsLoggingConn == null ? "unbound" : "bound";
-		String startStatus = started ? "started" : "not started";
+		String startStatus = startedSms ? "started" : "not started";
 		String statusText = "Service status: " + bindStatus + "," + startStatus;
 	}
 
@@ -342,5 +307,30 @@ public class MtprojectActivity extends Activity implements OnSharedPreferenceCha
 		super.onDestroy();
 		releaseSmsService();
 		Log.d(getClass().getSimpleName(), "onDestroy()");
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		checkServices(key);
+	}
+
+	private void checkServices(String key) {
+		if (key.equals("callsLogChk")) {
+			if (!startedCalls && callsCheckbox) {
+				startCallsService();
+				bindCallsService();
+			} else {
+				stopCallsService();
+				releaseCallsService();
+			}
+		} else if (key.equals("smsLogChk")) {
+			if (!startedSms && smsCheckbox) {
+				startSmsService();
+				bindSmsService();
+			} else {
+				stopSmsService();
+				releaseSmsService();
+			}
+		}
 	}
 }

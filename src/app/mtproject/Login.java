@@ -34,7 +34,6 @@ public class Login extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				
 				ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 				postParameters.add(new BasicNameValuePair("username", un.getText().toString()));
 				postParameters.add(new BasicNameValuePair("password", pw.getText().toString()));

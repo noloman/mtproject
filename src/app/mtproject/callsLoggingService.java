@@ -1,12 +1,19 @@
 package app.mtproject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,6 +25,7 @@ import android.util.Log;
 
 public class CallsLoggingService extends Service {
 	String date, duration, type;
+	Date durationDate;
 	String user_id;
 	public String username;
 
@@ -123,19 +131,41 @@ public class CallsLoggingService extends Service {
 				null, // WHERE clause; which rows to return(all rows)
 				null, // WHERE clause selection arguments (none)
 				CallLog.Calls.DEFAULT_SORT_ORDER // Order-by clause
-				// (ascending
-				// by name)
+				// (ascending by name)
 
 				);
 		if (c.moveToFirst()) {
 			do {
 				// Get the field values
-				date = c.getString(c.getColumnIndex(CallLog.Calls.DATE));
-				duration = c.getString(c.getColumnIndex(CallLog.Calls.DURATION));
+				try {
+					date = create_datestring(c.getString(c
+							.getColumnIndex(CallLog.Calls.DATE)));
+				} catch (java.text.ParseException e1) {
+					e1.printStackTrace();
+				}
+				duration = c
+						.getString(c.getColumnIndex(CallLog.Calls.DURATION));
 				type = c.getString(c.getColumnIndex(CallLog.Calls.TYPE));
 			} while (c.moveToNext());
 		}
 		retrieveUserId();
 		sendData(user_id);
+	}
+
+	public static String create_datestring(String timestring)
+			throws java.text.ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+				Locale.US);
+		Date dt = null;
+		Calendar c = Calendar.getInstance();
+		try {
+			dt = sdf.parse("2011-03-01 17:55:15");
+			c.setTime(dt);
+			System.out.println(c.getTimeInMillis());
+			System.out.println(dt.toString());
+		} catch (ParseException e) {
+			System.err.println("There's an error in the Date!");
+		}
+		return dt.toString();
 	}
 }

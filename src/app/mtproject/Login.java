@@ -6,8 +6,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +23,8 @@ public class Login extends Activity {
 	EditText un, pw;
 	TextView error;
 	Button ok;
+	ProgressDialog pd;
+	ArrayList<NameValuePair> postParameters;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -34,35 +40,54 @@ public class Login extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-				postParameters.add(new BasicNameValuePair("username", un.getText().toString()));
-				postParameters.add(new BasicNameValuePair("password", pw.getText().toString()));
+				postParameters = new ArrayList<NameValuePair>();
+				postParameters.add(new BasicNameValuePair("username", un
+						.getText().toString()));
+				postParameters.add(new BasicNameValuePair("password", pw
+						.getText().toString()));
 				String response = null;
 				try {
-					response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/login.php", postParameters);
-					String res = response.toString();
-					res = res.replaceAll("\\s+", "");
-					if (res.equals("1")) {
-						
-						// We launch main activity to get the app running after successful login
-						
-						Intent i = new Intent(getApplicationContext(), MtprojectActivity.class);
-						
-						i.putExtra("username", un.getText().toString());
-						// i.putExtra("Value2", "This value two ActivityTwo");
-						/* Set the request code to any code you like, you can
-						 * identify the callback via this code
-						 */
-						
-						startActivityForResult(i, REQUEST_CODE);
-					} else {
-						error.setText(res.toString());
-					}
+					pd = ProgressDialog.show(v.getContext(), "Working..",
+							"Logging the user in", true, false);
+					new Thread(new Runnable() {
+						public void run() {
+							logUserIn(postParameters);
+							pd.dismiss();
+						}
+					}).start();
 				} catch (Exception e) {
 					un.setText(e.toString());
 				}
 			}
 		});
+	}
+
+	private void logUserIn(ArrayList<NameValuePair> postParameters) {
+		String response = null;
+		String res = null;
+		try {
+			response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/login.php", postParameters);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		res = response.toString();
+		res = res.replaceAll("\\s+", "");
+		if (res.equals("1")) {
+
+			// We launch main activity to get the app running after successful login
+
+			Intent i = new Intent(getApplicationContext(),MtprojectActivity.class);
+			i.putExtra("username", un.getText().toString());
+
+			startActivityForResult(i, REQUEST_CODE);
+		} else {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					error.setText("Incorrect user/password");
+				}
+			});
+
+		}
 	}
 
 	@Override

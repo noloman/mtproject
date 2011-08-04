@@ -33,8 +33,7 @@ public class SmsLoggingService extends Service {
 				do {
 					dateColumn = cursor.getString(cursor.getColumnIndex("date"));
 					bodyColumn = cursor.getString(cursor.getColumnIndex("body"));
-					addressColumn = cursor.getString(cursor
-							.getColumnIndex("address"));
+					addressColumn = cursor.getString(cursor.getColumnIndex("address"));
 				} while (cursor.moveToNext());
 			}
 		}

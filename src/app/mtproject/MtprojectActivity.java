@@ -19,11 +19,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-public class MtprojectActivity extends Activity implements
-		OnSharedPreferenceChangeListener {
+public class MtprojectActivity extends Activity {
 	/** Called when the activity is first created. */
 
 	boolean callsCheckbox;
@@ -38,9 +40,7 @@ public class MtprojectActivity extends Activity implements
 	private ServiceConnection smsLoggingConnection;
 	public static final String PREFS_PRIVATE = "PREFS_PRIVATE";
 	public static final String KEY_PRIVATE = "KEY_PRIVATE";
-	private SharedPreferences prefsPrivate;
 	public static final String PREFS_NAME = "MyPrefsFile";
-	private OnSharedPreferenceChangeListener listener;
 
 	private boolean startedCalls, startedSms, startedLocation = false;
 
@@ -50,58 +50,65 @@ public class MtprojectActivity extends Activity implements
 	private IMyRemoteCallsLoggingService callsLoggingService;
 	private IMyRemoteSmsLoggingService smsLoggingService;
 	public String username;
-	SharedPreferences prefs;
+	private OnCheckedChangeListener listener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		username = getIntent().getExtras().getString("username");
-
-		// Retrieving preferences
-		callsCheckbox = prefs.getBoolean("callsLogChk", true);
-		smsCheckbox = prefs.getBoolean("smsLogChk", true);
-		locationCheckbox = prefs.getBoolean("locationLogChk", false);
-				
-		prefs.registerOnSharedPreferenceChangeListener(this);
-
 		setContentView(R.layout.main);
+		username = getIntent().getExtras().getString("username");
+		ToggleButton callsLoggingBtn = (ToggleButton) findViewById(R.id.callsLoggingBtn);
+		ToggleButton smsLoggingBtn = (ToggleButton) findViewById(R.id.smsLoggingBtn);
 
-		Button prefBtn = (Button) findViewById(R.id.prefsBtn);
+		/*
+		 * We first check that the status of the running services in case the
+		 * user has changed the focus of the app and set the status of the
+		 * buttons accordings to the running services.
+		 */
 
-		prefBtn.setOnClickListener(new OnClickListener() {
+		if (isCallsServiceRunning()) {
+			callsLoggingBtn.setChecked(true);
+		}
+		if (isSmsServiceRunning()) {
+			smsLoggingBtn.setChecked(true);
+		}
+
+		// TODO: Fix the following depending the lifecycles and the bind status
+		// or invokation and that stuff
+
+		callsLoggingBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				// Explicit intent to call the preferences
-				Intent preferencesActivity = new Intent(getBaseContext(),
-						Preferences.class);
-				startActivity(preferencesActivity);
+				if (!startedCalls) {
+					startCallsService();
+					bindCallsService();
+				} else {
+					releaseCallsService();
+					stopCallsService();
+				}
 			}
 		});
-		
-		if (!startedCalls && callsCheckbox)
-		{
-			startCallsService();
-			bindCallsService();
-		}
-		else if (startedCalls && callsCheckbox)
-		{
-			stopCallsService();
-			releaseCallsService();
-		}
+
+		smsLoggingBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				if (!startedSms) {
+					startSmsService();
+					bindSmsService();
+				} else {
+					releaseSmsService();
+					stopSmsService();
+				}
+			}
+		});
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// Set up a listener whenever a key changes
-		prefs.registerOnSharedPreferenceChangeListener(listener);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		// Unregister the listener whenever a key changes
-		prefs.unregisterOnSharedPreferenceChangeListener(listener);
 	}
 
 	public void startCallsService() {
@@ -125,7 +132,7 @@ public class MtprojectActivity extends Activity implements
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
+			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
 			startService(i);
 			startedSms = true;
 			updateSmsServiceStatus();
@@ -183,7 +190,7 @@ public class MtprojectActivity extends Activity implements
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
 			bindService(i, smsLoggingConnection, Context.BIND_AUTO_CREATE);
-			updateCallsServiceStatus();
+			updateSmsServiceStatus();
 			Log.d(getClass().getSimpleName(), "bindService()");
 		} else {
 			Toast.makeText(MtprojectActivity.this,
@@ -274,6 +281,7 @@ public class MtprojectActivity extends Activity implements
 			smsLoggingService = IMyRemoteSmsLoggingService.Stub
 					.asInterface((IBinder) boundService);
 			Log.d(getClass().getSimpleName(), "onServiceConnected()");
+			invokeSmsService();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -309,28 +317,27 @@ public class MtprojectActivity extends Activity implements
 		Log.d(getClass().getSimpleName(), "onDestroy()");
 	}
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		checkServices(key);
-	}
-
-	private void checkServices(String key) {
-		if (key.equals("callsLogChk")) {
-			if (!startedCalls && callsCheckbox) {
-				startCallsService();
-				bindCallsService();
-			} else {
-				stopCallsService();
-				releaseCallsService();
-			}
-		} else if (key.equals("smsLogChk")) {
-			if (!startedSms && smsCheckbox) {
-				startSmsService();
-				bindSmsService();
-			} else {
-				stopSmsService();
-				releaseSmsService();
+	private boolean isCallsServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if ("app.mtproject.CallsLoggingService".equals(service.service
+					.getClassName())) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	private boolean isSmsServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if ("app.mtproject.SmsLoggingService".equals(service.service
+					.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -41,14 +41,12 @@ public class Login extends Activity {
 			@Override
 			public void onClick(View v) {
 				postParameters = new ArrayList<NameValuePair>();
-				postParameters.add(new BasicNameValuePair("username", un
-						.getText().toString()));
+				postParameters.add(new BasicNameValuePair("username", un.getText().toString()));
 				postParameters.add(new BasicNameValuePair("password", pw
 						.getText().toString()));
 				String response = null;
 				try {
-					pd = ProgressDialog.show(v.getContext(), "Working..",
-							"Logging the user in", true, false);
+					pd = ProgressDialog.show(v.getContext(), "Working..","Logging the user in", true, false);
 					new Thread(new Runnable() {
 						public void run() {
 							logUserIn(postParameters);
@@ -86,7 +84,6 @@ public class Login extends Activity {
 					error.setText("Incorrect user/password");
 				}
 			});
-
 		}
 	}
 

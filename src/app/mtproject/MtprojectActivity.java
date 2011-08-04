@@ -111,7 +111,7 @@ public class MtprojectActivity extends Activity {
 		super.onPause();
 	}
 
-	public void startCallsService() {
+	private void startCallsService() {
 		if (startedCalls) {
 			Toast.makeText(MtprojectActivity.this, "Service already started",
 					Toast.LENGTH_SHORT).show();
@@ -133,6 +133,7 @@ public class MtprojectActivity extends Activity {
 		} else {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
+			i.putExtra("username", username);
 			startService(i);
 			startedSms = true;
 			updateSmsServiceStatus();
@@ -160,7 +161,7 @@ public class MtprojectActivity extends Activity {
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
+			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
 			stopService(i);
 			startedSms = false;
 			updateSmsServiceStatus();
@@ -188,7 +189,7 @@ public class MtprojectActivity extends Activity {
 		if (smsLoggingConnection == null) {
 			smsLoggingConnection = new RemoteSmsLoggingServiceConnection();
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.smsLoggingService");
+			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
 			bindService(i, smsLoggingConnection, Context.BIND_AUTO_CREATE);
 			updateSmsServiceStatus();
 			Log.d(getClass().getSimpleName(), "bindService()");

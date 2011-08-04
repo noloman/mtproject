@@ -110,7 +110,7 @@ public class CallsLoggingService extends Service {
 		try {
 			android.os.Debug.waitForDebugger();
 			response = CustomHttpClient.executeHttpPost(
-					"http://10.0.2.2/science/sendData.php", postParameters);
+					"http://10.0.2.2/science/sendCallsData.php", postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -138,13 +138,11 @@ public class CallsLoggingService extends Service {
 			do {
 				// Get the field values
 				try {
-					date = create_datestring(c.getString(c
-							.getColumnIndex(CallLog.Calls.DATE)));
+					date = create_datestring(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
 				} catch (java.text.ParseException e1) {
 					e1.printStackTrace();
 				}
-				duration = c
-						.getString(c.getColumnIndex(CallLog.Calls.DURATION));
+				duration = c.getString(c.getColumnIndex(CallLog.Calls.DURATION));
 				type = c.getString(c.getColumnIndex(CallLog.Calls.TYPE));
 			} while (c.moveToNext());
 		}

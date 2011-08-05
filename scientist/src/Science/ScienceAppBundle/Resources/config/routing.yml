@@ -1,0 +1,8 @@
+ScienceScienceAppBundle_hello:
+    pattern:  /hello/{name}
+    defaults: { _controller: ScienceScienceAppBundle:Default:index }
+    
+ScienceScienceAppBundle_homepage:
+    pattern: /home
+    defaults: { _controller: ScienceScienceAppBundle:Home:index }
+    

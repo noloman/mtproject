@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:gravity="center_horizontal">
+		<TextView android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="@string/instructions"
+			android:layout_marginBottom="10dp" />
+		<ToggleButton android:text="Calls logging" android:id="@+id/callsLoggingBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="Calls logging" android:textOff="Calls logging" />
+		<ToggleButton android:text="SMS logging" android:id="@+id/smsLoggingBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="SMS logging" android:textOff="SMS logging" />
+	</LinearLayout>
+	<TextView android:text="notApplicable" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:id="@+id/notApplicable"
+		android:layout_x="21dp" android:layout_y="236dp"></TextView>
+	<TextView android:text="TextView" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:id="@+id/serviceStatus"
+		android:layout_x="19dp" android:layout_y="267dp"></TextView>
+</AbsoluteLayout>

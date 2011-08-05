@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">ScienceApp</string>
+	<string name="instructions">Welcome to ScienceApp. Your calls and SMS will be
+		logged by default only starting this app.
+		In order to modify any of the
+		options, just click in the button
+		above called "Preferences".
+		Your
+		actions will be logged as long as the app is running in your device.
+	</string>
+</resources>

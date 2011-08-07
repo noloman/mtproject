@@ -34,10 +34,13 @@ public class MtprojectActivity extends Activity {
 	String ListPreference, editTextPreference, ringtonePreference,
 			secondEditTextPreference, customPref, date, duration, type,
 			bodyColumn, addressColumn, dateColumn;
+	
 	private CallsLoggingService callsService;
 	private SmsLoggingService smsService;
+	private LocationLoggingService locationService;
 	private ServiceConnection callsLoggingConnection;
 	private ServiceConnection smsLoggingConnection;
+	private ServiceConnection locationLoggingConnection;
 	public static final String PREFS_PRIVATE = "PREFS_PRIVATE";
 	public static final String KEY_PRIVATE = "KEY_PRIVATE";
 	public static final String PREFS_NAME = "MyPrefsFile";
@@ -46,9 +49,12 @@ public class MtprojectActivity extends Activity {
 
 	private RemoteSmsLoggingServiceConnection SmsLoggingConn = null;
 	private RemoteCallsLoggingServiceConnection CallsLoggingConn = null;
+	private RemoteLocationLoggingServiceConnection LocationLoggingConn = null;
 
 	private IMyRemoteCallsLoggingService callsLoggingService;
 	private IMyRemoteSmsLoggingService smsLoggingService;
+	private IMyRemoteLocationLoggingService locationLoggingService;
+	
 	public String username;
 	private OnCheckedChangeListener listener;
 
@@ -59,6 +65,7 @@ public class MtprojectActivity extends Activity {
 		username = getIntent().getExtras().getString("username");
 		ToggleButton callsLoggingBtn = (ToggleButton) findViewById(R.id.callsLoggingBtn);
 		ToggleButton smsLoggingBtn = (ToggleButton) findViewById(R.id.smsLoggingBtn);
+		ToggleButton locationLoggingBtn = (ToggleButton) findViewById(R.id.locationLogginBtn);
 
 		/*
 		 * We first check that the status of the running services in case the
@@ -71,6 +78,9 @@ public class MtprojectActivity extends Activity {
 		}
 		if (isSmsServiceRunning()) {
 			smsLoggingBtn.setChecked(true);
+		}
+		if (isLocationServiceRunning()) {
+			locationLoggingBtn.setChecked(true);
 		}
 
 		// TODO: Fix the following depending the lifecycles and the bind status
@@ -96,6 +106,18 @@ public class MtprojectActivity extends Activity {
 				} else {
 					releaseSmsService();
 					stopSmsService();
+				}
+			}
+		});
+		
+		locationLoggingBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				if (!startedLocation) {
+					startLocationService();
+					bindLocationService();
+				} else {
+					releaseLocationService();
+					stopLocationService();
 				}
 			}
 		});
@@ -140,6 +162,21 @@ public class MtprojectActivity extends Activity {
 			Log.d(getClass().getSimpleName(), "startService()");
 		}
 	}
+	
+	private void startLocationService() {
+		if (startedLocation) {
+			Toast.makeText(MtprojectActivity.this, "Service already started",
+					Toast.LENGTH_SHORT).show();
+		} else {
+			Intent i = new Intent();
+			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			i.putExtra("username", username);
+			startService(i);
+			startedLocation = true;
+			updateLocationServiceStatus();
+			Log.d(getClass().getSimpleName(), "startService()");
+		}
+	}
 
 	private void stopCallsService() {
 		if (!startedCalls) {
@@ -165,6 +202,20 @@ public class MtprojectActivity extends Activity {
 			stopService(i);
 			startedSms = false;
 			updateSmsServiceStatus();
+			Log.d(getClass().getSimpleName(), "stopService()");
+		}
+	}
+	
+	private void stopLocationService() {
+		if (!startedLocation) {
+			Toast.makeText(MtprojectActivity.this, "Service not yet started",
+					Toast.LENGTH_SHORT).show();
+		} else {
+			Intent i = new Intent();
+			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			stopService(i);
+			startedLocation = false;
+			updateLocationServiceStatus();
 			Log.d(getClass().getSimpleName(), "stopService()");
 		}
 	}
@@ -199,6 +250,22 @@ public class MtprojectActivity extends Activity {
 					.show();
 		}
 	}
+	
+	private void bindLocationService() {
+		if (LocationLoggingConn == null) {
+			LocationLoggingConn = new RemoteLocationLoggingServiceConnection();
+			Intent i = new Intent();
+			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			i.putExtra("username", username);
+			bindService(i, LocationLoggingConn, Context.BIND_AUTO_CREATE);
+			updateLocationServiceStatus();
+			Log.d(getClass().getSimpleName(), "bindService()");
+		} else {
+			Toast.makeText(MtprojectActivity.this,
+					"Cannot bind - service already bound", Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
 
 	private void releaseCallsService() {
 		if (CallsLoggingConn != null) {
@@ -218,6 +285,19 @@ public class MtprojectActivity extends Activity {
 			unbindService(SmsLoggingConn);
 			SmsLoggingConn = null;
 			updateSmsServiceStatus();
+			Log.d(getClass().getSimpleName(), "releaseService()");
+		} else {
+			Toast.makeText(MtprojectActivity.this,
+					"Cannot unbind - service not bound", Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+	
+	private void releaseLocationService() {
+		if (LocationLoggingConn != null) {
+			unbindService(LocationLoggingConn);
+			LocationLoggingConn = null;
+			updateLocationServiceStatus();
 			Log.d(getClass().getSimpleName(), "releaseService()");
 		} else {
 			Toast.makeText(MtprojectActivity.this,
@@ -259,12 +339,28 @@ public class MtprojectActivity extends Activity {
 			}
 		}
 	}
+	
+	private void invokeLocationService() {
+		if (LocationLoggingConn == null) {
+			Toast.makeText(MtprojectActivity.this,
+					"Cannot invoke - service not bound", Toast.LENGTH_SHORT)
+					.show();
+		} else {
+			try {
+				locationLoggingService.dumpLocationLog();
+				TextView t = (TextView) findViewById(R.id.notApplicable);
+				t.setText("It worked!");
+				Log.d(getClass().getSimpleName(), "invokeService()");
+			} catch (RemoteException e) {
+				Log.e(getClass().getSimpleName(), "RemoteException");
+			}
+		}
+	}
 
 	class RemoteCallsLoggingServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
-			callsLoggingService = IMyRemoteCallsLoggingService.Stub
-					.asInterface((IBinder) boundService);
+			callsLoggingService = IMyRemoteCallsLoggingService.Stub.asInterface((IBinder) boundService);
 			Log.d(getClass().getSimpleName(), "onServiceConnected()");
 			invokeCallsService();
 		}
@@ -272,6 +368,21 @@ public class MtprojectActivity extends Activity {
 		public void onServiceDisconnected(ComponentName className) {
 			callsLoggingService = null;
 			updateCallsServiceStatus();
+			Log.d(getClass().getSimpleName(), "onServiceDisconnected");
+		}
+	};
+	
+	class RemoteLocationLoggingServiceConnection implements ServiceConnection {
+		public void onServiceConnected(ComponentName className,
+				IBinder boundService) {
+			locationLoggingService = IMyRemoteLocationLoggingService.Stub.asInterface((IBinder) boundService);
+			Log.d(getClass().getSimpleName(), "onServiceConnected()");
+			invokeLocationService();
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			locationLoggingService = null;
+			updateLocationServiceStatus();
 			Log.d(getClass().getSimpleName(), "onServiceDisconnected");
 		}
 	};
@@ -305,6 +416,14 @@ public class MtprojectActivity extends Activity {
 		String startStatus = startedSms ? "started" : "not started";
 		String statusText = "Service status: " + bindStatus + "," + startStatus;
 	}
+	
+	private void updateLocationServiceStatus() {
+		String bindStatus = LocationLoggingConn == null ? "unbound" : "bound";
+		String startStatus = startedLocation ? "started" : "not started";
+		String statusText = "Service status: " + bindStatus + "," + startStatus;
+		TextView t = (TextView) findViewById(R.id.serviceStatus);
+		t.setText(statusText);
+	}
 
 	protected void onDestroyCallsService() {
 		super.onDestroy();
@@ -335,6 +454,18 @@ public class MtprojectActivity extends Activity {
 		for (RunningServiceInfo service : manager
 				.getRunningServices(Integer.MAX_VALUE)) {
 			if ("app.mtproject.SmsLoggingService".equals(service.service
+					.getClassName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isLocationServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if ("app.mtproject.LocationLoggingService".equals(service.service
 					.getClassName())) {
 				return true;
 			}

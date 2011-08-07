@@ -14,6 +14,9 @@
 		<ToggleButton android:text="SMS logging" android:id="@+id/smsLoggingBtn"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
 			android:textOn="SMS logging" android:textOff="SMS logging" />
+		<ToggleButton android:text="Location logging" android:id="@+id/locationLogginBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="Location logging" android:textOff="Location logging" />
 	</LinearLayout>
 	<TextView android:text="notApplicable" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:id="@+id/notApplicable"

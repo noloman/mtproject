@@ -108,7 +108,6 @@ public class CallsLoggingService extends Service {
 		postParameters.add(new BasicNameValuePair("type", type));
 		String response = null;
 		try {
-			android.os.Debug.waitForDebugger();
 			response = CustomHttpClient.executeHttpPost(
 					"http://10.0.2.2/science/sendCallsData.php", postParameters);
 			String res = response.toString();

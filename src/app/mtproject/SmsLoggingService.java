@@ -72,7 +72,6 @@ public class SmsLoggingService extends Service {
 	}
 
 	private void retrieveUserId() {
-		android.os.Debug.waitForDebugger();
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("username", username));
 		String response = null;
@@ -102,7 +101,6 @@ public class SmsLoggingService extends Service {
 		try {
 			response = CustomHttpClient.executeHttpPost(
 					"http://10.0.2.2/science/sendSmsData.php", postParameters);
-			android.os.Debug.waitForDebugger();
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -125,7 +123,6 @@ public class SmsLoggingService extends Service {
 				}
 				
 				body = cursor.getString(cursor.getColumnIndex("body"));
-				android.os.Debug.waitForDebugger();
 				destination = cursor.getString(cursor.getColumnIndex("address"));
 			} while (cursor.moveToNext());
 		}

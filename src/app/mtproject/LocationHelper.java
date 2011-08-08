@@ -12,14 +12,13 @@ public class LocationHelper implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location != null) {
-			android.os.Debug.waitForDebugger();
 			latitude = location.getLatitude();
 			longitude = location.getLongitude();
-			latString = Double.toString(latitude);
-			lngString = Double.toString(longitude);
-			Log.d("Location: ", getClass().getSimpleName());
-			Log.d(latString, getClass().getSimpleName());
-			Log.d(lngString, getClass().getSimpleName());
+			LocationLoggingService.latString = Double.toString(latitude);
+			LocationLoggingService.lngString = Double.toString(longitude);
+//			Log.d("Location: ", getClass().getSimpleName());
+//			Log.d(latString, getClass().getSimpleName());
+//			Log.d(lngString, getClass().getSimpleName());
 		}
 	}
 

@@ -7,10 +7,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +23,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 public class LocationLoggingService extends Service {
-	String latString, lngString;
+	static String latString;
+	static String lngString;
 	Double latitude, longitude;
 	Date durationDate;
 	String user_id;
@@ -108,7 +107,6 @@ public class LocationLoggingService extends Service {
 	protected void sendData(String user_id) {
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("user_id", user_id));
-		android.os.Debug.waitForDebugger();
 		postParameters.add(new BasicNameValuePair("latitude", latString));
 		postParameters.add(new BasicNameValuePair("longitude", lngString));
 		String response = null;
@@ -127,8 +125,9 @@ public class LocationLoggingService extends Service {
 	}
 	
 	private void dumpLocationLog() {
-		android.os.Debug.waitForDebugger();
-		new DumpLocationLog(context).start();
+		new DumpLocationLog(context, latString, lngString).start();
+		Log.d(latString, getClass().getSimpleName());
+		Log.d(lngString, getClass().getSimpleName());
         retrieveUserId();
         sendData(user_id);
 	}

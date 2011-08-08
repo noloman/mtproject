@@ -143,6 +143,16 @@ class appdevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
 
         }
 
+        // ScienceScienceAppBundle_hello
+        if (0 === strpos($pathinfo, '/hello') && preg_match('#^/hello/(?P<name>[^/]+?)$#x', $pathinfo, $matches)) {
+            return array_merge($this->mergeDefaults($matches, array (  '_controller' => 'Science\\ScienceAppBundle\\Controller\\DefaultController::indexAction',)), array('_route' => 'ScienceScienceAppBundle_hello'));
+        }
+
+        // ScienceScienceAppBundle_homepage
+        if ($pathinfo === '/home') {
+            return array (  '_controller' => 'Science\\ScienceAppBundle\\Controller\\HomeController::indexAction',  '_route' => 'ScienceScienceAppBundle_homepage',);
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

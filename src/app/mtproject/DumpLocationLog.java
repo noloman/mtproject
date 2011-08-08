@@ -17,8 +17,7 @@ public class DumpLocationLog extends Thread {
 	public void run() {
 		Looper.prepare();
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 500.0f, loc);
-		//LocationLoggingService.latString = loc.latString;
-		//lngString = loc.lngString;
+		lm.removeUpdates(loc);
 		Looper.loop();
 	}
 }

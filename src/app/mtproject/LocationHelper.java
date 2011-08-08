@@ -16,9 +16,6 @@ public class LocationHelper implements LocationListener {
 			longitude = location.getLongitude();
 			LocationLoggingService.latString = Double.toString(latitude);
 			LocationLoggingService.lngString = Double.toString(longitude);
-//			Log.d("Location: ", getClass().getSimpleName());
-//			Log.d(latString, getClass().getSimpleName());
-//			Log.d(lngString, getClass().getSimpleName());
 		}
 	}
 

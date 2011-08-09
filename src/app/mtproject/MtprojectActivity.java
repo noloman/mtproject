@@ -8,18 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,16 +31,17 @@ public class MtprojectActivity extends Activity {
 	String ListPreference, editTextPreference, ringtonePreference,
 			secondEditTextPreference, customPref, date, duration, type,
 			bodyColumn, addressColumn, dateColumn;
-	
+
 	private CallsLoggingService callsService;
 	private SmsLoggingService smsService;
 	private LocationLoggingService locationService;
 	private ServiceConnection callsLoggingConnection;
 	private ServiceConnection smsLoggingConnection;
 	private ServiceConnection locationLoggingConnection;
-	public static final String PREFS_PRIVATE = "PREFS_PRIVATE";
-	public static final String KEY_PRIVATE = "KEY_PRIVATE";
-	public static final String PREFS_NAME = "MyPrefsFile";
+
+	static final private int SHOW_PREFERENCES = Menu.FIRST;
+
+	int callsFrequencyUpdate, smsFrequencyUpdate, locationFrequencyUpdate = 0;
 
 	private boolean startedCalls, startedSms, startedLocation = false;
 
@@ -54,7 +52,7 @@ public class MtprojectActivity extends Activity {
 	private IMyRemoteCallsLoggingService callsLoggingService;
 	private IMyRemoteSmsLoggingService smsLoggingService;
 	private IMyRemoteLocationLoggingService locationLoggingService;
-	
+
 	public String username;
 	private OnCheckedChangeListener listener;
 
@@ -67,6 +65,7 @@ public class MtprojectActivity extends Activity {
 		ToggleButton smsLoggingBtn = (ToggleButton) findViewById(R.id.smsLoggingBtn);
 		ToggleButton locationLoggingBtn = (ToggleButton) findViewById(R.id.locationLogginBtn);
 
+		updateFromPreferences();
 		/*
 		 * We first check that the status of the running services in case the
 		 * user has changed the focus of the app and set the status of the
@@ -109,7 +108,7 @@ public class MtprojectActivity extends Activity {
 				}
 			}
 		});
-		
+
 		locationLoggingBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (!startedLocation) {
@@ -121,6 +120,38 @@ public class MtprojectActivity extends Activity {
 				}
 			}
 		});
+	}
+
+	private void updateFromPreferences() {
+		Context context = getApplicationContext();
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		callsFrequencyUpdate = Integer.parseInt(prefs.getString(
+				Preferences.CALLS_FREQUENCY_PREF, "0"));
+		smsFrequencyUpdate = Integer.parseInt(prefs.getString(
+				Preferences.SMS_FREQUENCY_PREF, "0"));
+		locationFrequencyUpdate = Integer.parseInt(prefs.getString(
+				Preferences.LOCATION_FREQUENCY_PREF, "0"));
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		menu.add(0, SHOW_PREFERENCES, Menu.NONE, R.string.preferences);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case SHOW_PREFERENCES: {
+			Intent i = new Intent(this, Preferences.class);
+			startActivityForResult(i, SHOW_PREFERENCES);
+			return true;
+			}
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -162,14 +193,15 @@ public class MtprojectActivity extends Activity {
 			Log.d(getClass().getSimpleName(), "startService()");
 		}
 	}
-	
+
 	private void startLocationService() {
 		if (startedLocation) {
 			Toast.makeText(MtprojectActivity.this, "Service already started",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			i.setClassName("app.mtproject",
+					"app.mtproject.LocationLoggingService");
 			i.putExtra("username", username);
 			startService(i);
 			startedLocation = true;
@@ -205,14 +237,15 @@ public class MtprojectActivity extends Activity {
 			Log.d(getClass().getSimpleName(), "stopService()");
 		}
 	}
-	
+
 	private void stopLocationService() {
 		if (!startedLocation) {
 			Toast.makeText(MtprojectActivity.this, "Service not yet started",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			i.setClassName("app.mtproject",
+					"app.mtproject.LocationLoggingService");
 			stopService(i);
 			startedLocation = false;
 			updateLocationServiceStatus();
@@ -250,12 +283,13 @@ public class MtprojectActivity extends Activity {
 					.show();
 		}
 	}
-	
+
 	private void bindLocationService() {
 		if (LocationLoggingConn == null) {
 			LocationLoggingConn = new RemoteLocationLoggingServiceConnection();
 			Intent i = new Intent();
-			i.setClassName("app.mtproject", "app.mtproject.LocationLoggingService");
+			i.setClassName("app.mtproject",
+					"app.mtproject.LocationLoggingService");
 			i.putExtra("username", username);
 			bindService(i, LocationLoggingConn, Context.BIND_AUTO_CREATE);
 			updateLocationServiceStatus();
@@ -292,7 +326,7 @@ public class MtprojectActivity extends Activity {
 					.show();
 		}
 	}
-	
+
 	private void releaseLocationService() {
 		if (LocationLoggingConn != null) {
 			unbindService(LocationLoggingConn);
@@ -339,7 +373,7 @@ public class MtprojectActivity extends Activity {
 			}
 		}
 	}
-	
+
 	private void invokeLocationService() {
 		if (LocationLoggingConn == null) {
 			Toast.makeText(MtprojectActivity.this,
@@ -360,7 +394,8 @@ public class MtprojectActivity extends Activity {
 	class RemoteCallsLoggingServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
-			callsLoggingService = IMyRemoteCallsLoggingService.Stub.asInterface((IBinder) boundService);
+			callsLoggingService = IMyRemoteCallsLoggingService.Stub
+					.asInterface((IBinder) boundService);
 			Log.d(getClass().getSimpleName(), "onServiceConnected()");
 			invokeCallsService();
 		}
@@ -371,11 +406,12 @@ public class MtprojectActivity extends Activity {
 			Log.d(getClass().getSimpleName(), "onServiceDisconnected");
 		}
 	};
-	
+
 	class RemoteLocationLoggingServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className,
 				IBinder boundService) {
-			locationLoggingService = IMyRemoteLocationLoggingService.Stub.asInterface((IBinder) boundService);
+			locationLoggingService = IMyRemoteLocationLoggingService.Stub
+					.asInterface((IBinder) boundService);
 			Log.d(getClass().getSimpleName(), "onServiceConnected()");
 			invokeLocationService();
 		}
@@ -416,7 +452,7 @@ public class MtprojectActivity extends Activity {
 		String startStatus = startedSms ? "started" : "not started";
 		String statusText = "Service status: " + bindStatus + "," + startStatus;
 	}
-	
+
 	private void updateLocationServiceStatus() {
 		String bindStatus = LocationLoggingConn == null ? "unbound" : "bound";
 		String startStatus = startedLocation ? "started" : "not started";
@@ -460,7 +496,7 @@ public class MtprojectActivity extends Activity {
 		}
 		return false;
 	}
-	
+
 	private boolean isLocationServiceRunning() {
 		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager

@@ -12,14 +12,18 @@
 	<string name="splashText">
 		<p>ScienceApp is an Android OS, built as graduation project
 			application for the MSc in Media Technology from the University of
-			Leiden (http://mediatechnology.leiden.edu/)</p>
+			Leiden (http://mediatechnology.leiden.edu/)
+		</p>
 		<p>This app helps scientists to manage the users of their experiments
 			by means of logging calls, sms and location of these users, so the
 			researchers can later withdraw conclusions in an easier way from the
-			data and information gathered.</p>
+			data and information gathered.
+		</p>
 		<p>In order to start the application, you have to press the button
 			ACCEPT, agreeing on that your personal data such as SMS, telephone
 			calls and your geospatial position will be tracked and sent to a
-			remote DB server for scientific purposes.</p>
+			remote DB server for scientific purposes.
+		</p>
 	</string>
+	<string name="preferences">Logging preferences</string>
 </resources>

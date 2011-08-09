@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="callsFrequencyItems">
+		<item>Send data every 1h</item>
+		<item>Send data every 2h</item>
+	</string-array>
+	<string-array name="callsFrequencyValues">
+		<item>1</item>
+		<item>2</item>
+	</string-array>
+	<string-array name="smsFrequencyItems">
+		<item>Send data every 1h</item>
+		<item>Send data every 2h</item>
+	</string-array>
+	<string-array name="smsFrequencyValues">
+		<item>1</item>
+		<item>2</item>
+	</string-array>
+	<string-array name="locationFrequencyItems">
+		<item>Send data every 1h</item>
+		<item>Send data every 2h</item>
+	</string-array>
+	<string-array name="locationFrequencyValues">
+		<item>1</item>
+		<item>2</item>
+	</string-array>
+</resources>

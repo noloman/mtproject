@@ -6,15 +6,17 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.provider.CallLog;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.TextView;
 
 public class SmsLoggingService extends Service {
 	String date, body, destination;
@@ -24,9 +26,14 @@ public class SmsLoggingService extends Service {
 	public String username;
 	private Task myTask = new Task();
 
+	Long frequency;
+	SharedPreferences prefs;
+	OnSharedPreferenceChangeListener listener;
+
 	@Override
-	public IBinder onBind(Intent arg0) {
+	public IBinder onBind(Intent i) {
 		Log.d(getClass().getSimpleName(), "onBind()");
+		username = i.getStringExtra("username");
 		return myRemoteSmsServiceStub;
 	}
 
@@ -55,7 +62,18 @@ public class SmsLoggingService extends Service {
 		username = intent.getStringExtra("username");
 		super.onStart(intent, startId);
 		serviceHandler = new Handler();
-		serviceHandler.postDelayed(myTask, 10L);
+		Context context = getApplicationContext();
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+			public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+				if (key.equals("SMS_FREQUENCY_PREF")) {
+					frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+				}
+			}
+		};
+		prefs.registerOnSharedPreferenceChangeListener(listener);
+		serviceHandler.postDelayed(myTask, frequency);
 		Log.d(getClass().getSimpleName(), "onStart()");
 	}
 
@@ -66,7 +84,7 @@ public class SmsLoggingService extends Service {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-			serviceHandler.postDelayed(this, 86400000L);
+			serviceHandler.postDelayed(this, frequency);
 			Log.i(getClass().getSimpleName(), "Calling the dumpSmsLog");
 		}
 	}
@@ -113,20 +131,29 @@ public class SmsLoggingService extends Service {
 	}
 
 	private void dumpSmsLog() {
-		Cursor cursor = getContentResolver().query(Uri.parse("content://sms/"),null, null, null, null);
+		Cursor cursor = getContentResolver().query(Uri.parse("content://sms/"),
+				null, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
 				try {
-					date = CallsLoggingService.create_datestring(cursor.getString(cursor.getColumnIndex("date")));
+					date = CallsLoggingService.create_datestring(cursor
+							.getString(cursor.getColumnIndex("date")));
 				} catch (java.text.ParseException e1) {
 					e1.printStackTrace();
 				}
-				
+
 				body = cursor.getString(cursor.getColumnIndex("body"));
-				destination = cursor.getString(cursor.getColumnIndex("address"));
+				destination = cursor
+						.getString(cursor.getColumnIndex("address"));
 			} while (cursor.moveToNext());
 		}
 		retrieveUserId();
 		sendData(user_id);
+	}
+	
+	
+	private Long toLong (int hours) {
+		Long frequency = Long.valueOf((((hours*60)*60)*1000));
+		return frequency;
 	}
 }

@@ -16,7 +16,7 @@
 		android:defaultValue="2" />
 	<ListPreference 
 		android:id="@+id/locationFrequencyPreferenceId"
-		android:key="LOC_FREQUENCY_PREF" 
+		android:key="LOCATION_FREQUENCY_PREF" 
 		android:title="Location"
 		android:entries="@array/locationFrequencyItems"
 		android:entryValues="@array/locationFrequencyValues" 

@@ -10,8 +10,12 @@ import java.util.TimerTask;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class LocationLoggingService extends Service {
@@ -31,10 +36,14 @@ public class LocationLoggingService extends Service {
 	public String username;
 	Context context;
 	LocationManager lm;
+	
+	long frequency;
+	SharedPreferences prefs;
+	OnSharedPreferenceChangeListener listener;
 
 	private Handler serviceHandler;
 	private Task myTask = new Task();
-
+	
 	@Override
 	public IBinder onBind(Intent i) {
 		Log.d(getClass().getSimpleName(), "onBind()");
@@ -68,7 +77,18 @@ public class LocationLoggingService extends Service {
 		username = intent.getStringExtra("username");
 		super.onStart(intent, startId);
 		serviceHandler = new Handler();
-		serviceHandler.postDelayed(myTask, 1000L);
+		Context context = getApplicationContext();
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+			public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+				if (key.equals("SMS_FREQUENCY_PREF")) {
+					frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+				}
+			}
+		};
+		prefs.registerOnSharedPreferenceChangeListener(listener);
+		serviceHandler.postDelayed(myTask, frequency);
 		Log.d(getClass().getSimpleName(), "onStart()");
 	}
 
@@ -79,7 +99,7 @@ public class LocationLoggingService extends Service {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-			serviceHandler.postDelayed(this, 5000L);
+			serviceHandler.postDelayed(this, frequency);
 			Log.i(getClass().getSimpleName(), "Calling the dumpLocationLog");
 		}
 	}
@@ -146,5 +166,11 @@ public class LocationLoggingService extends Service {
 			System.err.println("There's an error in the Date!");
 		}
 		return dt.toString();
+	}
+	
+	
+	private Long toLong (int hours) {
+		Long frequency = Long.valueOf((((hours*60)*60)*1000));
+		return frequency;
 	}
 }

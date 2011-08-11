@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -17,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -41,7 +41,9 @@ public class MtprojectActivity extends Activity {
 
 	static final private int SHOW_PREFERENCES = Menu.FIRST;
 
-	int callsFrequencyUpdate, smsFrequencyUpdate, locationFrequencyUpdate = 0;
+	SharedPreferences prefs;
+
+	int callsFrequencyUpdate, smsFrequencyUpdate, locationFrequencyUpdate;
 
 	private boolean startedCalls, startedSms, startedLocation = false;
 
@@ -54,7 +56,8 @@ public class MtprojectActivity extends Activity {
 	private IMyRemoteLocationLoggingService locationLoggingService;
 
 	public String username;
-	private OnCheckedChangeListener listener;
+	
+	OnSharedPreferenceChangeListener listener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,8 +67,25 @@ public class MtprojectActivity extends Activity {
 		ToggleButton callsLoggingBtn = (ToggleButton) findViewById(R.id.callsLoggingBtn);
 		ToggleButton smsLoggingBtn = (ToggleButton) findViewById(R.id.smsLoggingBtn);
 		ToggleButton locationLoggingBtn = (ToggleButton) findViewById(R.id.locationLogginBtn);
-
+		
 		updateFromPreferences();
+				
+		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if (key.equals("CALLS_FREQUENCY_PREF")) {
+                	callsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.CALLS_FREQUENCY_PREF, "0"));
+
+                } else if (key.equals("SMS_FREQUENCY_PREF")) {
+                	smsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0"));
+
+                } else if (key.equals("LOC_FREQUENCY_PREF")) {
+                	locationFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.LOCATION_FREQUENCY_PREF, "0"));
+                }
+            }
+        };
+		
+		prefs.registerOnSharedPreferenceChangeListener(listener);
+		
 		/*
 		 * We first check that the status of the running services in case the
 		 * user has changed the focus of the app and set the status of the
@@ -122,17 +142,33 @@ public class MtprojectActivity extends Activity {
 		});
 	}
 
-	private void updateFromPreferences() {
+	public void updateFromPreferences() {
 		Context context = getApplicationContext();
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		callsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.CALLS_FREQUENCY_PREF, "0"));
+		smsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0"));
+		locationFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.LOCATION_FREQUENCY_PREF, "0"));
+	}
 
-		callsFrequencyUpdate = Integer.parseInt(prefs.getString(
-				Preferences.CALLS_FREQUENCY_PREF, "0"));
-		smsFrequencyUpdate = Integer.parseInt(prefs.getString(
-				Preferences.SMS_FREQUENCY_PREF, "0"));
-		locationFrequencyUpdate = Integer.parseInt(prefs.getString(
-				Preferences.LOCATION_FREQUENCY_PREF, "0"));
+	private void savePreferences() {
+		SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = activityPreferences.edit();
+		editor.putInt(Preferences.CALLS_FREQUENCY_PREF, callsFrequencyUpdate);
+		editor.putInt(Preferences.SMS_FREQUENCY_PREF, smsFrequencyUpdate);
+		editor.putInt(Preferences.LOCATION_FREQUENCY_PREF,locationFrequencyUpdate);
+		editor.commit();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		savePreferences();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		savePreferences();
 	}
 
 	@Override
@@ -149,7 +185,7 @@ public class MtprojectActivity extends Activity {
 			Intent i = new Intent(this, Preferences.class);
 			startActivityForResult(i, SHOW_PREFERENCES);
 			return true;
-			}
+		}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -157,11 +193,6 @@ public class MtprojectActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
 	}
 
 	private void startCallsService() {
@@ -172,6 +203,7 @@ public class MtprojectActivity extends Activity {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.CallsLoggingService");
 			i.putExtra("username", username);
+			i.putExtra("frequency", callsFrequencyUpdate);
 			startService(i);
 			startedCalls = true;
 			updateCallsServiceStatus();
@@ -187,6 +219,7 @@ public class MtprojectActivity extends Activity {
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
 			i.putExtra("username", username);
+			i.putExtra("frequency", smsFrequencyUpdate);
 			startService(i);
 			startedSms = true;
 			updateSmsServiceStatus();
@@ -203,6 +236,7 @@ public class MtprojectActivity extends Activity {
 			i.setClassName("app.mtproject",
 					"app.mtproject.LocationLoggingService");
 			i.putExtra("username", username);
+			i.putExtra("frequency", locationFrequencyUpdate);
 			startService(i);
 			startedLocation = true;
 			updateLocationServiceStatus();
@@ -270,11 +304,11 @@ public class MtprojectActivity extends Activity {
 	}
 
 	private void bindSmsService() {
-		if (smsLoggingConnection == null) {
-			smsLoggingConnection = new RemoteSmsLoggingServiceConnection();
+		if (SmsLoggingConn == null) {
+			SmsLoggingConn = new RemoteSmsLoggingServiceConnection();
 			Intent i = new Intent();
 			i.setClassName("app.mtproject", "app.mtproject.SmsLoggingService");
-			bindService(i, smsLoggingConnection, Context.BIND_AUTO_CREATE);
+			bindService(i, SmsLoggingConn, Context.BIND_AUTO_CREATE);
 			updateSmsServiceStatus();
 			Log.d(getClass().getSimpleName(), "bindService()");
 		} else {

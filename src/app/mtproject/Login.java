@@ -42,8 +42,7 @@ public class Login extends Activity {
 			public void onClick(View v) {
 				postParameters = new ArrayList<NameValuePair>();
 				postParameters.add(new BasicNameValuePair("username", un.getText().toString()));
-				postParameters.add(new BasicNameValuePair("password", pw
-						.getText().toString()));
+				postParameters.add(new BasicNameValuePair("password", pw.getText().toString()));
 				String response = null;
 				try {
 					pd = ProgressDialog.show(v.getContext(), "Working..","Logging the user in", true, false);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -27,7 +28,8 @@ import android.util.Log;
 
 
 public class CallsLoggingService extends Service {
-	String date, duration, type;
+	String date;
+	String duration, type;
 	Date durationDate;
 	String user_id;
 	public String username;
@@ -93,7 +95,6 @@ public class CallsLoggingService extends Service {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-			android.os.Debug.waitForDebugger();
 			serviceHandler.postDelayed(this, frequency);
 			Log.i(getClass().getSimpleName(), "Calling the dumpCallsLog");
 		}
@@ -104,13 +105,11 @@ public class CallsLoggingService extends Service {
 		postParameters.add(new BasicNameValuePair("username", username));
 		String response = null;
 		try {
-			response = CustomHttpClient.executeHttpPost(
-					"http://10.0.2.2/science/getUserId.php", postParameters);
+			response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/getUserId.php", postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
-			if (!res.equals("0")) {
-				Log.d(getClass().getSimpleName(),
-						"Successfully retrieved user_id");
+			if (res.equals("1")) {
+				Log.d(getClass().getSimpleName(),"Successfully retrieved user_id");
 				user_id = res;
 			} else {
 				Log.d(getClass().getSimpleName(), "Error retrieving user_id");
@@ -123,6 +122,7 @@ public class CallsLoggingService extends Service {
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("user_id", user_id));
 		postParameters.add(new BasicNameValuePair("date", date));
+		Log.d(date, "Inserted date");
 		postParameters.add(new BasicNameValuePair("duration", duration));
 		postParameters.add(new BasicNameValuePair("type", type));
 		String response = null;
@@ -154,11 +154,13 @@ public class CallsLoggingService extends Service {
 				);
 		if (c.moveToFirst()) {
 			do {
-				// Get the field values
+				android.os.Debug.waitForDebugger();
+				//date = c.getString(c.getColumnIndex(CallLog.Calls.DATE));
+				android.os.Debug.waitForDebugger();
 				try {
-					date = create_datestring(c.getString(c.getColumnIndex(CallLog.Calls.DATE)));
-				} catch (java.text.ParseException e1) {
-					e1.printStackTrace();
+					date = create_datestring(c.getLong(c.getColumnIndex(CallLog.Calls.DATE)));
+				} catch (java.text.ParseException e) {
+					e.printStackTrace();
 				}
 				duration = c.getString(c.getColumnIndex(CallLog.Calls.DURATION));
 				type = c.getString(c.getColumnIndex(CallLog.Calls.TYPE));
@@ -168,21 +170,10 @@ public class CallsLoggingService extends Service {
 		sendData(user_id);
 	}
 
-	public static String create_datestring(String timestring)
-			throws java.text.ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-				Locale.US);
-		Date dt = null;
-		Calendar c = Calendar.getInstance();
-		try {
-			dt = sdf.parse("2011-03-01 17:55:15");
-			c.setTime(dt);
-			System.out.println(c.getTimeInMillis());
-			System.out.println(dt.toString());
-		} catch (ParseException e) {
-			System.err.println("There's an error in the Date!");
-		}
-		return dt.toString();
+	public static String create_datestring(Long date) throws java.text.ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
+		Date finalDate = new Date(date);
+		return formatter.format(finalDate);
 	}
 	
 	

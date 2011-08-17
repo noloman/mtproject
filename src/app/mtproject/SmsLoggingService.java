@@ -1,6 +1,8 @@
 package app.mtproject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -64,11 +66,14 @@ public class SmsLoggingService extends Service {
 		serviceHandler = new Handler();
 		Context context = getApplicationContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+		frequency = toLong(Integer.parseInt(prefs.getString(
+				Preferences.SMS_FREQUENCY_PREF, "0")));
 		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-			public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+			public void onSharedPreferenceChanged(SharedPreferences prefs,
+					String key) {
 				if (key.equals("SMS_FREQUENCY_PREF")) {
-					frequency = toLong(Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "0")));
+					frequency = toLong(Integer.parseInt(prefs.getString(
+							Preferences.SMS_FREQUENCY_PREF, "0")));
 				}
 			}
 		};
@@ -136,8 +141,7 @@ public class SmsLoggingService extends Service {
 		if (cursor.moveToFirst()) {
 			do {
 				try {
-					date = CallsLoggingService.create_datestring(cursor
-							.getString(cursor.getColumnIndex("date")));
+					date = create_datestring(cursor.getString(cursor.getColumnIndex("date")));
 				} catch (java.text.ParseException e1) {
 					e1.printStackTrace();
 				}
@@ -150,10 +154,17 @@ public class SmsLoggingService extends Service {
 		retrieveUserId();
 		sendData(user_id);
 	}
-	
-	
-	private Long toLong (int hours) {
-		Long frequency = Long.valueOf((((hours*60)*60)*1000));
+
+	public static String create_datestring(String string)
+			throws java.text.ParseException {
+		android.os.Debug.waitForDebugger();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String formattedDateString = sdf.format(string);
+		return formattedDateString;
+	}
+
+	private Long toLong(int hours) {
+		Long frequency = Long.valueOf((((hours * 60) * 60) * 1000));
 		return frequency;
 	}
 }

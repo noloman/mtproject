@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent" android:layout_width="match_parent"
+	android:orientation="vertical">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_height="wrap_content" android:layout_width="match_parent"
+		android:orientation="vertical">
+		<TextView android:text="@string/instructions"
+			android:layout_width="fill_parent" android:layout_height="104dp"></TextView>
+	</LinearLayout>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_height="wrap_content" android:layout_width="match_parent"
+		android:orientation="vertical" android:layout_gravity="center_horizontal"
+		android:gravity="center_horizontal|center_vertical">
+		<ToggleButton android:text="Calls logging" android:id="@+id/callsLoggingBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="Calls logging" android:textOff="Calls logging" />
+		<ToggleButton android:text="SMS logging" android:id="@+id/smsLoggingBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="SMS logging" android:textOff="SMS logging" />
+		<ToggleButton android:text="Location logging" android:id="@+id/locationLogginBtn"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textOn="Location logging" android:textOff="Location logging" />
+	</LinearLayout>
+</LinearLayout>

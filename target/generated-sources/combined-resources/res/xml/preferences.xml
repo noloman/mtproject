@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<ListPreference 
+		android:key="CALLS_FREQUENCY_PREF"
+		android:id="@+id/callsFrequencyPreferenceId" 
+		android:title="Calls"
+		android:entries="@array/callsFrequencyItems"
+		android:entryValues="@array/callsFrequencyValues" 
+		android:defaultValue="86400000" />
+	<ListPreference 
+	android:key="SMS_FREQUENCY_PREF"
+		android:title="SMS" 
+		android:id="@+id/smsFrequencyPreferenceId"
+		android:entries="@array/smsFrequencyItems"
+		android:entryValues="@array/smsFrequencyValues" 
+		android:defaultValue="86400000" />
+	<ListPreference 
+		android:id="@+id/locationFrequencyPreferenceId"
+		android:key="LOCATION_FREQUENCY_PREF" 
+		android:title="Location"
+		android:entries="@array/locationFrequencyItems"
+		android:entryValues="@array/locationFrequencyValues" 
+		android:defaultValue="86400000" />
+</PreferenceScreen>

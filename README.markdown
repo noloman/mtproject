@@ -35,7 +35,7 @@ Coming soon
 
 ### License
 
-The code in this project is licensed under the Apache Software License 2.0, per the terms of the included LICENSE file.
+Copyright (c) Manuel Lorenzo Parejo, 2011, Leiden Institute of Advanced Computer Science, Universiteit Leiden.
 
 ---------
 

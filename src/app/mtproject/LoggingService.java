@@ -42,6 +42,7 @@ public class LoggingService extends WakefulIntentService {
 	private String destination;
 	private String latitude, longitude;
 	private String serviceToStop;
+	String serverAddress;
 
 	AlarmManager alarms;
 	PendingIntent callsAlarmIntent, smsAlarmIntent, locationAlarmIntent;
@@ -69,8 +70,11 @@ public class LoggingService extends WakefulIntentService {
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("username", username));
 		String response = null;
+		StringBuilder str = new StringBuilder(serverAddress);
+		str.append("getUserId.php");
+		String serverConnection = str.toString();
 		try {
-			response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/getUserId.php", postParameters);
+			response = CustomHttpClient.executeHttpPost(serverConnection, postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -91,8 +95,11 @@ public class LoggingService extends WakefulIntentService {
 		postParameters.add(new BasicNameValuePair("duration", duration));
 		postParameters.add(new BasicNameValuePair("type", type));
 		String response = null;
+		StringBuilder str = new StringBuilder(serverAddress);
+		str.append("sendCallsData.php");
+		String serverConnection = str.toString();
 		try {
-			response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/sendCallsData.php", postParameters);
+			response = CustomHttpClient.executeHttpPost(serverConnection, postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -112,9 +119,11 @@ public class LoggingService extends WakefulIntentService {
 		postParameters.add(new BasicNameValuePair("body", body));
 		postParameters.add(new BasicNameValuePair("destination", destination));
 		String response = null;
+		StringBuilder str = new StringBuilder(serverAddress);
+		str.append("sendSmsData.php");
+		String serverConnection = str.toString();
 		try {
-			response = CustomHttpClient.executeHttpPost(
-					"http://10.0.2.2/science/sendSmsData.php", postParameters);
+			response = CustomHttpClient.executeHttpPost(serverConnection, postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -134,10 +143,11 @@ public class LoggingService extends WakefulIntentService {
 		Log.d(latitude, "latitude");
 		Log.d(longitude, "longitude");
 		String response = null;
+		StringBuilder str = new StringBuilder(serverAddress);
+		str.append("sendLocationData.php");
+		String serverConnection = str.toString();
 		try {
-			response = CustomHttpClient.executeHttpPost(
-					"http://10.0.2.2/science/sendLocationData.php",
-					postParameters);
+			response = CustomHttpClient.executeHttpPost(serverConnection, postParameters);
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
@@ -227,10 +237,11 @@ public class LoggingService extends WakefulIntentService {
 
 	@Override
 	protected void doWakefulWork(Intent intent) {
-		alarms = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		alarmType = AlarmManager.RTC_WAKEUP;
 		context = getApplicationContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	    serverAddress = prefs.getString(Preferences.SERVER_ADDRESS, "http://10.0.2.2/science/");
+		alarms = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		alarmType = AlarmManager.RTC_WAKEUP;
 		username = intent.getStringExtra("username");
 		serviceToStart = intent.getStringExtra("serviceToStart");
 		serviceToStop = intent.getStringExtra("serviceToStop");

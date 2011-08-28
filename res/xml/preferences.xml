@@ -21,4 +21,9 @@
 		android:entries="@array/locationFrequencyItems"
 		android:entryValues="@array/locationFrequencyValues" 
 		android:defaultValue="86400000" />
+	<EditTextPreference
+		android:id="@+id/serverAddressId"
+		android:key="SERVER_ADDRESS"
+		android:title="Remote server address"
+		android:defaultValue="http://10.0.2.2/science/" />
 </PreferenceScreen>

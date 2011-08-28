@@ -10,14 +10,16 @@ later withdraw conclusions in an easier way from the data and information gather
 ### Dependencies
 
 AndroSci uses the libraries [CWAC-LOCPOL] (https://github.com/commonsguy/cwac-locpoll) and [CWAC-WAKEFUL] (https://github.com/commonsguy/cwac-wakeful), 
-two libraries created by [CommonsGuy] (https://github.com/commonsguy) to help the application perform its tasks.
+two AWESOME libraries created by [CommonsGuy] (https://github.com/commonsguy) to help the application perform its tasks.
 
 Although this code corresponds only to the mobile application, AndroSci is meant to be used with a remote Apache server and a MySQL DB in order to be able to interchange data.
 We have also created the web application to be installed in the remote Apache server so as to provide a way for scientists to interact and visualize the data.
 
 ### Usage
+---------
 
 Coming soon
+
 
 ### Version
 

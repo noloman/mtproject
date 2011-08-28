@@ -6,19 +6,19 @@
 		android:title="Calls"
 		android:entries="@array/callsFrequencyItems"
 		android:entryValues="@array/callsFrequencyValues" 
-		android:defaultValue="2" />
+		android:defaultValue="86400000" />
 	<ListPreference 
 	android:key="SMS_FREQUENCY_PREF"
 		android:title="SMS" 
 		android:id="@+id/smsFrequencyPreferenceId"
 		android:entries="@array/smsFrequencyItems"
 		android:entryValues="@array/smsFrequencyValues" 
-		android:defaultValue="2" />
+		android:defaultValue="86400000" />
 	<ListPreference 
 		android:id="@+id/locationFrequencyPreferenceId"
 		android:key="LOCATION_FREQUENCY_PREF" 
 		android:title="Location"
 		android:entries="@array/locationFrequencyItems"
 		android:entryValues="@array/locationFrequencyValues" 
-		android:defaultValue="2" />
+		android:defaultValue="86400000" />
 </PreferenceScreen>

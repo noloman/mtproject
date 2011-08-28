@@ -1,27 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="callsFrequencyItems">
+	<string-array name="callsFrequencyItems">
 		<item>Send data every 1h</item>
 		<item>Send data every 2h</item>
+		<item>Send data every 3h</item>
+		<item>Send data every 4h</item>
+		<item>Send data every 6h</item>
+		<item>Send data every 8h</item>
+		<item>Send data every 12h</item>
+		<item>Send data every 24h</item>
 	</string-array>
 	<string-array name="callsFrequencyValues">
-		<item>1</item>
-		<item>2</item>
+		<item>3600000</item>
+		<item>7200000</item>
+		<item>10800000</item>
+		<item>14400000</item>
+		<item>21600000</item>
+		<item>28800000</item>
+		<item>43200000</item>
+		<item>86400000</item>
 	</string-array>
 	<string-array name="smsFrequencyItems">
 		<item>Send data every 1h</item>
 		<item>Send data every 2h</item>
+		<item>Send data every 3h</item>
+		<item>Send data every 4h</item>
+		<item>Send data every 6h</item>
+		<item>Send data every 8h</item>
+		<item>Send data every 12h</item>
+		<item>Send data every 24h</item>
 	</string-array>
 	<string-array name="smsFrequencyValues">
-		<item>1</item>
-		<item>2</item>
+		<item>3600000</item>
+		<item>7200000</item>
+		<item>10800000</item>
+		<item>14400000</item>
+		<item>21600000</item>
+		<item>28800000</item>
+		<item>43200000</item>
+		<item>86400000</item>
 	</string-array>
 	<string-array name="locationFrequencyItems">
 		<item>Send data every 1h</item>
 		<item>Send data every 2h</item>
+		<item>Send data every 3h</item>
+		<item>Send data every 4h</item>
+		<item>Send data every 6h</item>
+		<item>Send data every 8h</item>
+		<item>Send data every 12h</item>
+		<item>Send data every 24h</item>
 	</string-array>
 	<string-array name="locationFrequencyValues">
-		<item>1</item>
-		<item>2</item>
+		<item>3600000</item>
+		<item>7200000</item>
+		<item>10800000</item>
+		<item>14400000</item>
+		<item>21600000</item>
+		<item>28800000</item>
+		<item>43200000</item>
+		<item>86400000</item>
 	</string-array>
 </resources>

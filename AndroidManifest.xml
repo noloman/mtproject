@@ -9,12 +9,13 @@
 	<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
 	<uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
 	<uses-permission android:name="android.permission.CONTROL_LOCATION_UPDATES" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-sdk android:minSdkVersion="10" />
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name=".MtprojectActivity" android:label="@string/app_name" />
-
 		<activity android:name=".Preferences" android:label="Preferences" />
-		<activity android:name=".SplashScreen" android:label="SplashScreen">
+		<activity android:name=".SplashScreen" android:label="SplashScreen"
+			android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -22,23 +23,33 @@
 		</activity>
 		<activity android:name=".Login" android:label="User login"
 			android:theme="@android:style/Theme.NoTitleBar">
-
 		</activity>
-		<service android:name="CallsLoggingService" android:process=":remote">
+		<service android:enabled="true" android:name="LoggingService">
 			<intent-filter>
-				<action android:name="app.mtproject.IMyRemoteCallsLoggingService" />
+				<action android:name="ACTION_CALLS_LOGGING" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="ACTION_SMS_LOGGING" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="ACTION_LOCATION_LOGGING" />
 			</intent-filter>
 		</service>
-		<service android:name="SmsLoggingService" android:process=":remote">
+		<receiver android:name=".LoggingReceiver">
 			<intent-filter>
-				<action android:name="app.mtproject.IMyRemoteSmsLoggingService" />
+				<action android:name="ACTION_CALLS_LOGGING" />
+				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
-		</service>
-		<service android:name="LocationLoggingService"
-			android:process=":remote">
 			<intent-filter>
-				<action android:name="app.mtproject.IMyRemoteLocationLoggingService" />
+				<action android:name="ACTION_SMS_LOGGING" />
+				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
-		</service>
+			<intent-filter>
+				<action android:name="ACTION_LOCATION_LOGGING" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</receiver>
+		<receiver android:name="cwac.locpoll.LocationPoller" />
+		<service android:name="cwac.locpoll.LocationPollerService" />
 	</application>
 </manifest>

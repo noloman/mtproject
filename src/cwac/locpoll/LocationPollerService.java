@@ -46,8 +46,7 @@ public class LocationPollerService extends Service {
 	 */
 	synchronized private static PowerManager.WakeLock getLock(Context context) {
 		if (lockStatic == null) {
-			PowerManager mgr = (PowerManager) context
-					.getSystemService(Context.POWER_SERVICE);
+			PowerManager mgr = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
 			lockStatic = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 					LOCK_NAME_STATIC);
@@ -170,8 +169,7 @@ public class LocationPollerService extends Service {
 		 *            Intent to be broadcast when location found or timeout
 		 *            occurs
 		 */
-		PollerThread(PowerManager.WakeLock lock, LocationManager locMgr,
-				String provider, Intent intentTemplate) {
+		PollerThread(PowerManager.WakeLock lock, LocationManager locMgr, String provider, Intent intentTemplate) {
 			super(lock, "LocationPoller-PollerThread");
 
 			this.locMgr = locMgr;

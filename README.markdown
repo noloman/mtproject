@@ -35,7 +35,7 @@ Coming soon
 
 ### License
 
-Copyright (c) Manuel Lorenzo Parejo, 2011, Leiden Institute of Advanced Computer Science, Universiteit Leiden.
+Copyright (c) 2011 Manuel Lorenzo Parejo, Leiden Institute of Advanced Computer Science, Universiteit Leiden.
 
 ---------
 

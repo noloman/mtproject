@@ -82,25 +82,6 @@ public class MtprojectActivity extends Activity {
 
 		prefs.registerOnSharedPreferenceChangeListener(listener);
 
-		/*
-		 * We first check that the status of the running services in case the
-		 * user has changed the focus of the app and set the status of the
-		 * buttons accordings to the running services.
-		 */
-
-		// if (isCallsServiceRunning()) {
-		// callsLoggingBtn.setChecked(true);
-		// }
-		// if (isSmsServiceRunning()) {
-		// smsLoggingBtn.setChecked(true);
-		// }
-		// if (isLocationServiceRunning()) {
-		// locationLoggingBtn.setChecked(true);
-		// }
-
-		// TODO: Fix the following depending the lifecycles and the bind status
-		// or invokation and that stuff
-
 		callsLoggingBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (!startedCalls) {

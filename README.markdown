@@ -29,6 +29,8 @@ Coming soon
 
 ### Version
 
+1.0.1 - Added date for location updates and destination number for calls
+
 1.0.0 - First release of AndroSci app in an early alpha status.
 
 ---------

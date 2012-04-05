@@ -1,0 +1,8 @@
+video: 
+1. Introduction: why this app should be there
+2. demo: what is it? what does it do? just show it!
+3. how did we make it? show code
+4. reflexion: what happened, what's next, etc.
+
+- Write down a scientific paper along with the app, same structure as video.
+- supervisor must judge que quality of the data and the app in general.

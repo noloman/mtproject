@@ -1,0 +1,4 @@
+host: scienceapp.shakinglabs.com
+dbname: shakingl_scienceapp
+user: shaki_scienceapp
+pass: sciencemola

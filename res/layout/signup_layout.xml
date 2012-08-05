@@ -58,11 +58,10 @@
         android:layout_height="wrap_content"
         android:text="Country" />
 
-    <EditText
-        android:id="@+id/UserCountryEditText"
+    <Spinner
+        android:id="@+id/UserCountrySpinner"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text" />
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/RegisterButton"

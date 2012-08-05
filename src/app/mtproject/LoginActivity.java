@@ -7,21 +7,21 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Login extends Activity {
+public class LoginActivity extends Activity {
 	private static final int REQUEST_CODE = 10;
 	EditText un, pw;
 	TextView error;
+	Button mSingUpButton;
 	Button ok;
 	ProgressDialog pd;
 	ArrayList<NameValuePair> postParameters;
@@ -30,14 +30,22 @@ public class Login extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.login_layout);
 		un = (EditText) findViewById(R.id.et_un);
 		pw = (EditText) findViewById(R.id.et_pw);
 		ok = (Button) findViewById(R.id.btn_login);
 		error = (TextView) findViewById(R.id.tv_error);
-
+		mSingUpButton = (Button) findViewById(R.id.btn_signup);
+		mSingUpButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent();
+				i.setClass(LoginActivity.this, SignUpActivity.class);
+				startActivity(i);
+			}
+		});
+		
 		ok.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				postParameters = new ArrayList<NameValuePair>();
@@ -64,6 +72,7 @@ public class Login extends Activity {
 		String res = null;
 		try {
 			response = CustomHttpClient.executeHttpPost("http://10.0.2.2/science/login.php", postParameters);
+			Log.i("MT", postParameters.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

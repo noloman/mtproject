@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="210dip"
+    android:layout_marginTop="10dip"
+    android:background="@drawable/bg1" >
+
+    <TextView
+        android:id="@+id/tv_un"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="9dip"
+        android:layout_marginTop="20dip"
+        android:text="User Name:"
+        android:textColor="#FFFFFF"
+        android:textSize="10pt" />
+
+    <EditText
+        android:id="@+id/et_un"
+        android:layout_width="150dip"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/tv_un"
+        android:layout_toRightOf="@id/tv_un"
+        android:background="@android:drawable/editbox_background" />
+
+    <TextView
+        android:id="@+id/tv_pw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_un"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="9dip"
+        android:layout_marginTop="15dip"
+        android:text="Password:"
+        android:textColor="#FFFFFF"
+        android:textSize="10pt" />
+
+    <EditText
+        android:id="@+id/et_pw"
+        android:layout_width="150dip"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/tv_pw"
+        android:layout_below="@id/et_un"
+        android:layout_marginLeft="17dip"
+        android:layout_toRightOf="@id/tv_pw"
+        android:background="@android:drawable/editbox_background"
+        android:password="true" />
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#AA0000"
+        android:textSize="7pt" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tv_error"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dip"
+            android:layout_marginTop="15dip"
+            android:gravity="center"
+            android:text="Login" />
+
+        <Button
+            android:id="@+id/btn_signup"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="Not a user yet?" />
+    </RelativeLayout>
+
+</RelativeLayout>

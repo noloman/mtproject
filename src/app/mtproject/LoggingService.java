@@ -248,7 +248,7 @@ public class LoggingService extends WakefulIntentService {
 	protected void doWakefulWork(Intent intent) {
 		context = getApplicationContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
-	    serverAddress = prefs.getString(Preferences.SERVER_ADDRESS, "http://10.0.2.2/science/");
+	    serverAddress = prefs.getString(PreferencesActivity.SERVER_ADDRESS, "http://10.0.2.2/science/");
 		alarms = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarmType = AlarmManager.RTC_WAKEUP;
 		username = intent.getStringExtra("username");

@@ -52,7 +52,7 @@ public class MtprojectActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_layout);
 		username = getIntent().getExtras().getString("username");
 
 		ToggleButton callsLoggingBtn = (ToggleButton) findViewById(R.id.callsLoggingBtn);
@@ -66,15 +66,15 @@ public class MtprojectActivity extends Activity {
 					String key) {
 				if (key.equals("CALLS_FREQUENCY_PREF")) {
 					callsFrequencyUpdate = Integer.parseInt(prefs.getString(
-							Preferences.CALLS_FREQUENCY_PREF, "86400000"));
+							PreferencesActivity.CALLS_FREQUENCY_PREF, "86400000"));
 
 				} else if (key.equals("SMS_FREQUENCY_PREF")) {
 					smsFrequencyUpdate = Integer.parseInt(prefs.getString(
-							Preferences.SMS_FREQUENCY_PREF, "86400000"));
+							PreferencesActivity.SMS_FREQUENCY_PREF, "86400000"));
 
 				} else if (key.equals("LOC_FREQUENCY_PREF")) {
 					locationFrequencyUpdate = Integer.parseInt(prefs.getString(
-							Preferences.LOCATION_FREQUENCY_PREF, "86400000"));
+							PreferencesActivity.LOCATION_FREQUENCY_PREF, "86400000"));
 				}
 			}
 		};
@@ -116,19 +116,19 @@ public class MtprojectActivity extends Activity {
 	public void updateFromPreferences() {
 		Context context = getApplicationContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		callsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.CALLS_FREQUENCY_PREF, "86400000"));
-		smsFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.SMS_FREQUENCY_PREF, "86400000"));
-		locationFrequencyUpdate = Integer.parseInt(prefs.getString(Preferences.LOCATION_FREQUENCY_PREF, "86400000"));
-	    serverAddress = prefs.getString(Preferences.SERVER_ADDRESS, "http://localhost");
+		callsFrequencyUpdate = Integer.parseInt(prefs.getString(PreferencesActivity.CALLS_FREQUENCY_PREF, "86400000"));
+		smsFrequencyUpdate = Integer.parseInt(prefs.getString(PreferencesActivity.SMS_FREQUENCY_PREF, "86400000"));
+		locationFrequencyUpdate = Integer.parseInt(prefs.getString(PreferencesActivity.LOCATION_FREQUENCY_PREF, "86400000"));
+	    serverAddress = prefs.getString(PreferencesActivity.SERVER_ADDRESS, "http://localhost");
 	}
 
 	private void savePreferences() {
 		SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = activityPreferences.edit();
-		editor.putInt(Preferences.CALLS_FREQUENCY_PREF, callsFrequencyUpdate);
-		editor.putInt(Preferences.SMS_FREQUENCY_PREF, smsFrequencyUpdate);
-		editor.putInt(Preferences.LOCATION_FREQUENCY_PREF, locationFrequencyUpdate);
-		editor.putString(Preferences.SERVER_ADDRESS, serverAddress);
+		editor.putInt(PreferencesActivity.CALLS_FREQUENCY_PREF, callsFrequencyUpdate);
+		editor.putInt(PreferencesActivity.SMS_FREQUENCY_PREF, smsFrequencyUpdate);
+		editor.putInt(PreferencesActivity.LOCATION_FREQUENCY_PREF, locationFrequencyUpdate);
+		editor.putString(PreferencesActivity.SERVER_ADDRESS, serverAddress);
 		editor.commit();
 	}
 
@@ -169,7 +169,7 @@ public class MtprojectActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case SHOW_PREFERENCES: {
-			Intent i = new Intent(this, Preferences.class);
+			Intent i = new Intent(this, PreferencesActivity.class);
 			startActivityForResult(i, SHOW_PREFERENCES);
 			return true;
 		}

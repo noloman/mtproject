@@ -22,8 +22,9 @@ public class SignUpActivity extends Activity {
 	private static final int REQUEST_CODE = 10;
 	Button mSendButton;
 	ArrayList<NameValuePair> postParameters;
-	EditText mUsername, mPassword, mUserAge;
-	Spinner mUserCountry;
+	EditText mUsername, mPassword;
+	Spinner mUserAgeSpinner;
+	Spinner mUserCountrySpinner;
 	Spinner mUserSexSpinner;
 	ProgressDialog mProgressDialog;
 	TextView mErrorTv;
@@ -31,27 +32,37 @@ public class SignUpActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.signup_layout);
-		mUserAge = (EditText) findViewById(R.id.UserAgeEditText);
-		mUserCountry = (Spinner) findViewById(R.id.UserCountrySpinner);
+		mUserAgeSpinner = (Spinner) findViewById(R.id.UserAgeSpinner);
+		mUserCountrySpinner = (Spinner) findViewById(R.id.UserCountrySpinner);
 		mUserSexSpinner = (Spinner) findViewById(R.id.UserSexSpinner);
 		mErrorTv = (TextView) findViewById(R.id.SignUpErrorTextView);
 		mUsername = (EditText) findViewById(R.id.UsernameEditText);
 		mPassword = (EditText) findViewById(R.id.PasswordEditText);
 		mSendButton = (Button) findViewById(R.id.RegisterButton);
 
-		ArrayAdapter<CharSequence> userSexAdapter = ArrayAdapter.createFromResource(
-				this, R.array.UserSexValues,
-				android.R.layout.simple_spinner_item);
-		userSexAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ArrayAdapter<CharSequence> userSexAdapter = ArrayAdapter
+				.createFromResource(this, R.array.UserSexValues,
+						android.R.layout.simple_spinner_item);
+		userSexAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mUserSexSpinner.setAdapter(userSexAdapter);
 		mUserSexSpinner.setSelection(0);
-		
-		ArrayAdapter<CharSequence> countriesAdapter = ArrayAdapter.createFromResource(
-				this, R.array.countries_list,
-				android.R.layout.simple_spinner_item);
-		countriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mUserCountry.setAdapter(countriesAdapter);
-		mUserCountry.setSelection(0);
+
+		ArrayAdapter<CharSequence> countriesAdapter = ArrayAdapter
+				.createFromResource(this, R.array.countries_list,
+						android.R.layout.simple_spinner_item);
+		countriesAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mUserCountrySpinner.setAdapter(countriesAdapter);
+		mUserCountrySpinner.setSelection(0);
+
+		ArrayAdapter<CharSequence> ageAdapter = ArrayAdapter
+				.createFromResource(this, R.array.age_array,
+						android.R.layout.simple_spinner_item);
+		ageAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mUserAgeSpinner.setAdapter(ageAdapter);
+		mUserAgeSpinner.setSelection(0);
 
 		mSendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -61,12 +72,25 @@ public class SignUpActivity extends Activity {
 						.getText().toString()));
 				postParameters.add(new BasicNameValuePair("password", mPassword
 						.getText().toString()));
-				postParameters.add(new BasicNameValuePair("user_age", mUserAge
-						.getText().toString()));
-				postParameters.add(new BasicNameValuePair("user_sex",
-						mUserSexSpinner.getSelectedItem().toString()));
-				postParameters.add(new BasicNameValuePair("user_country",
-						mUserCountry.getSelectedItem().toString()));
+				if (mUserAgeSpinner.getSelectedItemPosition() != 0) {
+					postParameters.add(new BasicNameValuePair("user_age",
+							mUserAgeSpinner.getSelectedItem().toString()));
+				} else {
+					postParameters.add(new BasicNameValuePair("user_age", ""));
+				}
+				if (mUserSexSpinner.getSelectedItemPosition() != 0) {
+					postParameters.add(new BasicNameValuePair("user_sex", ""));
+				} else {
+					postParameters.add(new BasicNameValuePair("user_sex",
+							mUserSexSpinner.getSelectedItem().toString()));
+				}
+				if (mUserCountrySpinner.getSelectedItemPosition() != 0) {
+					postParameters.add(new BasicNameValuePair("user_country",
+							mUserCountrySpinner.getSelectedItem().toString()));
+				} else {
+					postParameters.add(new BasicNameValuePair("user_country",
+							""));
+				}
 				try {
 					mProgressDialog = ProgressDialog.show(SignUpActivity.this,
 							"Working..", "User registration in progress", true,
